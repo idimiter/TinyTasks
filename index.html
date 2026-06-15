@@ -17,7 +17,13 @@ body {
 	border-radius: 50%;
 }
 
+.subtask {
+	display: block;
+}
+
 fieldset {
+	display: inline-block;
+	vertical-align: top;
 	background-color: #424242;
 	padding: 10px;
 	margin: 10px;
@@ -111,6 +117,8 @@ function RefreshProjects()
 			subtask = project.subtasks[j];
 
 			let subtaskDiv = document.createElement("div");
+			subtaskDiv.className = "subTask";
+
 			let subtaskCheckbox = document.createElement("input");
 			subtaskCheckbox.id = "subtask_" + i + "_" + j;
 			subtaskCheckbox.type = "checkbox";
