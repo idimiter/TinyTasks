@@ -7,8 +7,9 @@
 
 <style>
 body {
-	background-color: black;
 	font-family: Verdana, sans-serif;
+	background: black;
+	background: radial-gradient(circle, rgba(42, 42, 42, 1) 0%, rgba(0, 0, 0, 1) 100%);
 }
 
 .round-btn {
@@ -18,24 +19,28 @@ body {
 }
 
 .subtask {
+	font-size: 1em;
 	display: block;
 }
 
 fieldset {
+	background: black;
+	background: linear-gradient(180deg, rgba(42, 42, 42, 1) 0%, rgba(0, 0, 0, 1) 100%);
+
 	display: inline-block;
 	overflow: auto;
 	resize: both;
 	min-inline-size: 0;
 	min-width: 12em;
 	min-height: 12em;
-
+	/*width: 15em;*/
   	vertical-align: top;
 	background-color: #424242;
 	padding: 10px;
 	margin: 10px;
-	border: 1px solid #666;
+	border: 1px solid #00aa00;
 	border-radius: 7px;
-	box-shadow: 0 0 7px #fff;
+	box-shadow: 0 0 7px #00ee00;
 }
 
 legend {
@@ -49,18 +54,18 @@ legend {
 
 label {
 	padding: 10px;
-	color: white;
+	color: limegreen;
 	font-size: 1.2em;
 }
 
 input[type="checkbox"]:checked + label {
 	text-decoration: line-through;
-	color: gray;
+	color: darkgreen;
 }
 
 button {
-	background-color: gray;
-	color: #000;
+	background: radial-gradient(circle, rgba(142, 142, 142, 1) 0%, rgba(0, 0, 0, 1) 100%);
+	color: white;
 	margin-left: 5px;
 }
 
