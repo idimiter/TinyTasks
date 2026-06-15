@@ -1,0 +1,271 @@
+<html>
+<head>
+	<title>Tiny Task Manager</title>
+
+	<meta name="author" content="Dimitar T. Dimitrov" />
+	<meta name="description" content="Tiny Task Manager" />
+
+<style>
+body {
+	background-color: black;
+	font-family: Verdana, sans-serif;
+}
+
+
+fieldset {
+	background-color: #424242;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #666;
+	border-radius: 7px;
+	box-shadow: 0 0 7px #fff;
+}
+
+legend {
+	background-color: #333;
+	color: white;
+	font-weight: bold;
+	padding: 5px;
+	border: 1px solid #666;
+	border-radius: 5px;
+}
+
+label {
+	color: white;
+	font-size: 1.2em;
+}
+
+input[type="checkbox"]:checked + label {
+	text-decoration: line-through;
+	color: gray;
+}
+
+button {
+	background-color: gray;
+}
+
+</style>
+
+
+<script>
+
+class TinyTask {
+	constructor(name, completed = false, subtasks = []) {
+		this.name = name;
+		this.completed = completed;
+		this.subtasks = subtasks;
+	}
+}
+
+var projects = [];
+
+window.onload = function() {
+	let loadedProjects = localStorage.getItem('tinyTasksJSON');
+
+	if (loadedProjects) {
+		projects = JSON.parse(loadedProjects);
+		RefreshProjects();
+	}
+};
+
+function RefreshProjects()
+{
+	var context = document.getElementById("tiny_tasks");
+	while(context.firstChild) { context.removeChild(context.firstChild); }
+
+	for (let i = 0; i < projects.length; i++)
+	{
+		let projectID = i;
+		let project = projects[i];
+
+		let fieldset = document.createElement("fieldset");
+		fieldset.id = projectID;
+
+		let legend = document.createElement("legend");
+		legend.textContent = project.name;
+
+		let editProjectButton = document.createElement("button");
+		editProjectButton.textContent = "✎";
+		editProjectButton.addEventListener('click', editProject.bind(this, projectID));
+		legend.appendChild(editProjectButton);
+
+		let deleteProjectButton = document.createElement("button");
+		deleteProjectButton.textContent = "🗑";
+		deleteProjectButton.addEventListener('click', deleteProject.bind(this, projectID));
+		legend.appendChild(deleteProjectButton);
+
+		fieldset.appendChild(legend);
+
+		for (let j = 0; j < project.subtasks.length; j++)
+		{
+			subtaskID = j;
+			subtask = project.subtasks[j];
+
+			let subtaskDiv = document.createElement("div");
+			let subtaskCheckbox = document.createElement("input");
+			subtaskCheckbox.id = "subtask_" + i + "_" + j;
+			subtaskCheckbox.type = "checkbox";
+			subtaskCheckbox.addEventListener('change', toggleTask.bind(this, projectID, subtaskID));
+			subtaskCheckbox.checked = subtask.completed;
+			let subtaskLabel = document.createElement("label");
+			subtaskLabel.htmlFor = "subtask_" + i + "_" + j;
+			subtaskLabel.textContent = subtask.name;
+
+			subtaskDiv.appendChild(subtaskCheckbox);
+			subtaskDiv.appendChild(subtaskLabel);
+
+			let editSubtaskButton = document.createElement("button");
+			editSubtaskButton.textContent = "✎";
+			editSubtaskButton.addEventListener('click', editSubTask.bind(this, projectID, subtaskID));
+			subtaskDiv.appendChild(editSubtaskButton);
+
+			let deleteSubtaskButton = document.createElement("button");
+			deleteSubtaskButton.textContent = "🗑";
+			deleteSubtaskButton.addEventListener('click', deleteSubTask.bind(this, projectID, subtaskID));
+			subtaskDiv.appendChild(deleteSubtaskButton);
+
+			fieldset.appendChild(subtaskDiv);
+		}
+
+
+		fieldset.appendChild(document.createElement("br"));
+		let newSubtaskButton = document.createElement("button");
+		newSubtaskButton.textContent = "+";
+		newSubtaskButton.addEventListener('click', newSubTask.bind(this, projectID));
+
+		fieldset.appendChild(newSubtaskButton);
+
+		context.appendChild(fieldset);
+	}
+
+	document.body.appendChild(context);
+}
+
+function SaveProjects() {
+	localStorage.setItem('tinyTasksJSON', JSON.stringify(projects, null, "\t"));
+
+	RefreshProjects();
+}
+
+function newProject() {
+	let projectName = prompt("Project Name: ");
+
+	if (projectName != null) {
+		let newProject = new TinyTask(projectName);
+		projects.push(newProject);
+
+		SaveProjects();
+	}
+}
+
+function deleteProject(projectID) {
+	if (confirm("Delete: " + projects[projectID].name + "?")) {
+		projects.splice(projectID, 1);
+		SaveProjects();
+	}
+}
+
+function editProject(projectID)
+{
+	let newName = prompt("Edit", projects[projectID].name);
+	if (newName) {
+		projects[projectID].name = newName;
+		SaveProjects();
+	}
+}
+
+function newSubTask(projectID) {
+	let taskName = prompt("Task Name: ");
+
+	if (taskName != null) {
+		let newTask = new TinyTask(taskName);
+		projects[projectID].subtasks.push(newTask);
+
+		SaveProjects();
+	}
+}
+
+function deleteSubTask(projectID, taskID) {
+	if (confirm("Delete: " + projects[projectID].name + " task: " + projects[projectID].subtasks[taskID].name + "?")) {
+		projects[projectID].subtasks.splice(taskID, 1);
+
+		SaveProjects();
+	}
+}
+
+function editSubTask(projectID, taskID) {
+	let newName = prompt("Edit", projects[projectID].subtasks[taskID].name);
+
+	if (newName) {
+		projects[projectID].subtasks[taskID].name = newName;
+		SaveProjects();
+	}
+}
+
+function toggleTask(projectID, taskID) {
+	projects[projectID].subtasks[taskID].completed = !projects[projectID].subtasks[taskID].completed;
+	SaveProjects();
+}
+
+function exportProjects() {
+	exportText("tiny_projects.json", JSON.stringify(projects));
+}
+
+function purgeProjects() {
+	if (confirm("Purge all projects?")) {
+		localStorage.removeItem("tinyTasksJSON");
+		projects = [];
+		RefreshProjects();
+	}
+}
+
+function importProjects(element) {
+	const file = element.files?.[0];
+
+	const fileReader = new FileReader();
+	fileReader.readAsText(file, 'UTF-8');
+
+	fileReader.onload = function({ target }) {
+		let fileText = target.result;
+
+		try {
+			loadedProjects = JSON.parse(fileText);
+		} catch (e) {
+			return alert(e);
+		}
+
+		projects = loadedProjects;
+		SaveProjects();
+	}
+
+}
+
+function exportText(filename, text) {
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	element.setAttribute('download', filename);
+
+	element.style.display = 'none';
+	document.body.appendChild(element);
+
+	element.click();
+
+	document.body.removeChild(element);
+}
+
+
+</script>
+</head>
+
+<body>
+<input type="button" onclick="purgeProjects()" style="background-color: red;" value="🗑" />
+<input type="button" onclick="exportProjects()" value="Export" />
+<input type="file" onchange = "importProjects(this)" />
+
+<div id="tiny_tasks"></div>
+
+<br /><br />
+<button onclick="newProject()">+</button>
+
+</body>
+</html>
