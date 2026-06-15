@@ -11,6 +11,11 @@ body {
 	font-family: Verdana, sans-serif;
 }
 
+.round-btn {
+	height: 32px;
+	width: 32px;
+	border-radius: 50%;
+}
 
 fieldset {
 	background-color: #424242;
@@ -31,6 +36,7 @@ legend {
 }
 
 label {
+	padding: 10px;
 	color: white;
 	font-size: 1.2em;
 }
@@ -42,6 +48,7 @@ input[type="checkbox"]:checked + label {
 
 button {
 	background-color: gray;
+	margin-left: 5px;
 }
 
 </style>
@@ -86,11 +93,13 @@ function RefreshProjects()
 
 		let editProjectButton = document.createElement("button");
 		editProjectButton.textContent = "✎";
+		editProjectButton.className = "round-btn";
 		editProjectButton.addEventListener('click', editProject.bind(this, projectID));
 		legend.appendChild(editProjectButton);
 
 		let deleteProjectButton = document.createElement("button");
 		deleteProjectButton.textContent = "🗑";
+		deleteProjectButton.className = "round-btn";
 		deleteProjectButton.addEventListener('click', deleteProject.bind(this, projectID));
 		legend.appendChild(deleteProjectButton);
 
@@ -265,7 +274,7 @@ function exportText(filename, text) {
 <div id="tiny_tasks"></div>
 
 <br /><br />
-<button onclick="newProject()">+</button>
+<button onclick="newProject()" class="round-btn">+</button>
 
 </body>
 </html>
